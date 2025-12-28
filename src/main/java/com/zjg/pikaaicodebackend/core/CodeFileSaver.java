@@ -36,8 +36,8 @@ public class CodeFileSaver {
         String baseDirPath = buildUniqueDir(CodeGenTypeEnum.MULTI_FILE.getValue());
 
         writeToFile(baseDirPath, "index.html", result.getHtmlCode());
-        writeToFile(baseDirPath, "style.css", result.getHtmlCode());
-        writeToFile(baseDirPath, "script.js", result.getHtmlCode());
+        writeToFile(baseDirPath, "style.css", result.getCssCode());
+        writeToFile(baseDirPath, "script.js", result.getJsCode());
 
         return new File(baseDirPath);
     }
