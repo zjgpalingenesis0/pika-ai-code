@@ -7,6 +7,7 @@ import com.zjg.pikaaicodebackend.ai.model.MultiFileCodeResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 /**
  * 代码解析器
  * 提供静态方法解析不同类型的代码内容
