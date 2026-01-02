@@ -1,6 +1,9 @@
 package com.zjg.pikaaicodebackend.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IORuntimeException;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
@@ -22,12 +25,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.zjg.pikaaicodebackend.constant.AppConstant.*;
 import static com.zjg.pikaaicodebackend.exception_.ErrorCode.*;
 
 /**
@@ -125,6 +131,51 @@ public class AppServiceImpl extends ServiceImpl<AppMapper, App> implements AppSe
         ThrowUtils.throwIf(codeGenTypeEnum == null, SYSTEM_ERROR, "不支持的代码生成类型");
         //调用AI生成代码
         return aiCodeGeneratorFacade.generateAndSaveCodeStream(message, codeGenTypeEnum, appId);
+    }
+
+    @Override
+    public String deployApp(Long appId, User loginUser) {
+        ThrowUtils.throwIf(appId == null || appId <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(loginUser == null, NOT_FOUND_ERROR, "用户不存在");
+
+        //查询应用信息
+        App app = this.getById(appId);
+        ThrowUtils.throwIf(app == null, NOT_FOUND_ERROR, "应用不存在");
+        //验证用户是否有权限部署该应用，仅本人可以部署
+        if (!loginUser.getId().equals(app.getUserId())) {
+            throw new BusinessException(NO_AUTH_ERROR, "权限不够");
+        }
+        //检查是否有 部署标识
+        String deployKey = app.getDeployKey();
+        if (StrUtil.isBlank(deployKey)) {
+            deployKey = RandomUtil.randomString(6);
+        }
+        //获取代码生成类型,构建源目录路径
+        String codeGenType = app.getCodeGenType();
+        String sourceDirName = codeGenType + "_" + appId;
+        String sourceDirPath = CODE_OUTPUT_ROOT_DIR + File.separator + sourceDirName;
+        //检查源目录是否存在
+        File sourceDir = new File(sourceDirPath);
+        if (!sourceDir.exists() || !sourceDir.isDirectory()) {
+            throw new BusinessException(SYSTEM_ERROR, "应用代码不存在，请先生成代码");
+        }
+        //复制文件到部署目录
+        String deployDirPath = CODE_DEPLOY_ROOT_DIR + File.separator + deployKey;
+        File deployDir = new File(deployDirPath);
+        try {
+            FileUtil.copyContent(sourceDir, deployDir, true);
+        } catch (Exception e) {
+            throw new BusinessException(SYSTEM_ERROR, "部署失败, " + e.getMessage());
+        }
+        //更新deployKey deploytime
+        App updateApp = new App();
+        updateApp.setId(appId);
+        updateApp.setDeployKey(deployKey);
+        updateApp.setDeployedTime(LocalDateTime.now());
+        boolean result = this.updateById(updateApp);
+        ThrowUtils.throwIf(!result, OPERATION_ERROR,"更新失败");
+        //返回可访问的URL
+        return String.format("%s/%s/", CODE_DEPLOY_HOST, deployKey);
     }
 
 }

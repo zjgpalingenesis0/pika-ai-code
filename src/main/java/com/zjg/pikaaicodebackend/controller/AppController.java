@@ -298,4 +298,18 @@ public class AppController {
                         .build()
         ));
     }
+
+    @PostMapping("deploy")
+    public BaseResponse<String> deployApp(@RequestBody AppDeployRequest appDeployRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(appDeployRequest == null, PARAMS_ERROR);
+        Long appId = appDeployRequest.getId();
+        ThrowUtils.throwIf(appId == null || appId <= 0, PARAMS_ERROR);
+
+        User loginUser = userService.getCurrentUser(request);
+        //调用服务部署应用
+        String url = appService.deployApp(appId, loginUser);
+
+        return ResultUtils.success(url);
+    }
+
 }
