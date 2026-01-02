@@ -17,14 +17,16 @@ class AiCodeGeneratorServiceTest {
 
     @Test
     void generateHtmlCode() {
-        String userMessage = "做一个程序员wanfeng的工作记录小工具";
+//        String userMessage = "做一个程序员wanfeng的工作记录小工具";
+        String userMessage = "做一个wanfeng的每周计划表";
         HtmlCodeResult result = aiCodeGeneratorService.generateHtmlCode(userMessage);
         Assertions.assertNotNull(result);
     }
 
     @Test
     void generateMultiFileCode() {
-        String userMessage = "做一个程序员wanfeng的留言板";
+//        String userMessage = "做一个程序员wanfeng的留言板";
+        String userMessage = "做一个wanfeng的每周计划表";
         MultiFileCodeResult result = aiCodeGeneratorService.generateMultiFileCode(userMessage);
         Assertions.assertNotNull(result);
     }

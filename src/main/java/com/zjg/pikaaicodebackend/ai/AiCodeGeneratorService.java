@@ -22,7 +22,7 @@ public interface AiCodeGeneratorService {
      * @param userMessage
      * @return
      */
-    @SystemMessage(fromResource = "prompt/codegen-multi-file-system-prompt.txt")
+    @SystemMessage(fromResource = "prompt/codegen-multi-file-json-system-prompt.txt")
     MultiFileCodeResult generateMultiFileCode(String userMessage);
 
     /**

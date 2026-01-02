@@ -9,6 +9,7 @@ import com.zjg.pikaaicodebackend.model.enums_.CodeGenTypeEnum;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 
+import static com.zjg.pikaaicodebackend.exception_.ErrorCode.PARAMS_ERROR;
 import static com.zjg.pikaaicodebackend.exception_.ErrorCode.SYSTEM_ERROR;
 
 /**
@@ -27,11 +28,11 @@ public abstract class CodeFileSaverTemplate<T> {
      * @param result  代码结果对象
      * @return
      */
-    public final File saveFile(T result) {
+    public final File saveFile(T result, Long appId) {
         //验证输入
         validInput(result);
         //构建唯一目录
-        String baseDirPath = buildUniqueDir();
+        String baseDirPath = buildUniqueDir(appId);
         //保存文件(子类要实现的抽象方法)
         saveFiles(result, baseDirPath);
         //返回文件对象
@@ -50,9 +51,11 @@ public abstract class CodeFileSaverTemplate<T> {
      * 构建唯一目录路径
      * @return
      */
-    protected final String buildUniqueDir() {
+    protected final String buildUniqueDir(Long appId) {
+        //校验
+        ThrowUtils.throwIf(appId == null || appId <= 0, PARAMS_ERROR);
         String codeType = getCodeType().getValue();
-        String uniqueDirName = String.format("%s_%s", codeType, IdUtil.getSnowflakeNextIdStr());
+        String uniqueDirName = String.format("%s_%s", codeType, appId);
         //完整路径
         String dirPath = FILE_SAVE_ROOT_DIR + File.separator + uniqueDirName;
         FileUtil.mkdir(dirPath);
