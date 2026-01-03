@@ -8,6 +8,7 @@ import com.zjg.pikaaicodebackend.model.entity.User;
 import com.zjg.pikaaicodebackend.model.vo.AppVO;
 import reactor.core.publisher.Flux;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -37,6 +38,14 @@ public interface AppService extends IService<App> {
      * @return QueryWrapper
      */
     QueryWrapper getQueryWrapper(AppQueryRequest appQueryRequest);
+
+    /**
+     * 删除应用时关联删除对话历史
+     *
+     * @param id
+     * @return
+     */
+    boolean removeById(Serializable id);
 
     /**
      * 调用门面生成代码
