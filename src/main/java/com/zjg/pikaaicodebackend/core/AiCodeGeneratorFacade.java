@@ -1,6 +1,7 @@
 package com.zjg.pikaaicodebackend.core;
 
 import com.zjg.pikaaicodebackend.ai.AiCodeGeneratorService;
+import com.zjg.pikaaicodebackend.ai.AiCodeGeneratorServiceFactory;
 import com.zjg.pikaaicodebackend.ai.model.HtmlCodeResult;
 import com.zjg.pikaaicodebackend.ai.model.MultiFileCodeResult;
 import com.zjg.pikaaicodebackend.core.parser.CodeParserExecutor;
@@ -23,8 +24,10 @@ import static com.zjg.pikaaicodebackend.exception_.ErrorCode.SYSTEM_ERROR;
 @Service
 @Slf4j
 public class AiCodeGeneratorFacade {
+
     @Resource
-    private AiCodeGeneratorService aiCodeGeneratorService;
+    private AiCodeGeneratorServiceFactory aiCodeGeneratorServiceFactory;
+
 
     /**
      * 统一接口，根据类型生成并保存代码
@@ -35,6 +38,8 @@ public class AiCodeGeneratorFacade {
         if (codeGenTypeEnum == null) {
             throw new BusinessException(SYSTEM_ERROR, "生成代码类型不存在");
         }
+        // 根据 appId 获取相应的 AI 服务实例
+        AiCodeGeneratorService aiCodeGeneratorService = aiCodeGeneratorServiceFactory.getAiCodeGeneratorService(appId);
         return switch(codeGenTypeEnum) {
             case HTML -> {
                 HtmlCodeResult result = aiCodeGeneratorService.generateHtmlCode(userMessage);
@@ -61,6 +66,8 @@ public class AiCodeGeneratorFacade {
         if (codeGenTypeEnum == null) {
             throw new BusinessException(SYSTEM_ERROR, "生成代码类型不存在");
         }
+        // 根据 appId 获取相应的 AI 服务实例
+        AiCodeGeneratorService aiCodeGeneratorService = aiCodeGeneratorServiceFactory.getAiCodeGeneratorService(appId);
         return switch(codeGenTypeEnum) {
             case HTML -> {
                 Flux<String> htmlCodeStream = aiCodeGeneratorService.generateHtmlCodeStream(userMessage);

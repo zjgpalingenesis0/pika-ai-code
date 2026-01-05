@@ -7,6 +7,7 @@ import com.zjg.pikaaicodebackend.model.dto.chatHistory.ChatHistoryAddRequest;
 import com.zjg.pikaaicodebackend.model.dto.chatHistory.ChatHistoryQueryRequest;
 import com.zjg.pikaaicodebackend.model.entity.ChatHistory;
 import com.zjg.pikaaicodebackend.model.entity.User;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,4 +60,13 @@ public interface ChatHistoryService extends IService<ChatHistory> {
      * @return 是否成功
      */
     boolean deleteChatHistoryByAppId(Long appId);
+
+    /**
+     * 对话记忆初始化时，从数据库中加载对话历史到记忆中
+     * @param appId
+     * @param chatMemory
+     * @param maxCount
+     * @return
+     */
+    int loadChatHistoryToMemory(Long appId, MessageWindowChatMemory chatMemory, int maxCount);
 }

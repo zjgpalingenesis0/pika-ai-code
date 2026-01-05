@@ -2,7 +2,9 @@ package com.zjg.pikaaicodebackend.ai;
 
 import com.zjg.pikaaicodebackend.ai.model.HtmlCodeResult;
 import com.zjg.pikaaicodebackend.ai.model.MultiFileCodeResult;
+import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
 import reactor.core.publisher.Flux;
 
 /**
@@ -40,4 +42,7 @@ public interface AiCodeGeneratorService {
      */
     @SystemMessage(fromResource = "prompt/codegen-multi-file-system-prompt.txt")
     Flux<String> generateMultiFileCodeStream(String userMessage);
+
+//    @SystemMessage(fromResource = "prompt/codegen-html-system-prompt.txt")
+//    HtmlCodeResult generateHtmlCodeMemory(@MemoryId int memoryId, @UserMessage String userMessage);
 }
